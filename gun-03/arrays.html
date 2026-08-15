@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+<script>
+
+
+//  map, filter, slice, concat,reduce, flat, flatMap metodları kullanılacak.
+
+
+// burada ok fonksiyonları ile çok hızlı ve pratik dizi filtreleme yapacağız. Örnek: (urun => urun.fiyat < 12500) ve
+// .map(urun=> urun.urunAdi); çıktı: fiyatı 12,5k dan düşük olan ürünlerin adını getirir.
+// 1. Karmaşık ve iç içe geçmiş API verisi (Gerçek dünyada veriler genelde böyle pis gelir)
+
+
+
+// --- METOTLARIN KULLANIMI ---
+
+// 1. concat: İki farklı sipariş listesini birleştirir.
+const hamSiparisler = [
+    { siparisId: 1, urunler: [{ ad: "Laptop", fiyat: 35000 }, { ad: "Mouse", fiyat: 1500 }] },
+    { siparisId: 2, urunler: [{ ad: "Mekanik Klavye", fiyat: 4500 }] },
+    { siparisId: 3, urunler: [{ ad: "Monitör", fiyat: 14000 }, { ad: "Mousepad", fiyat: 400 }] }
+];
+
+const yedekSiparisler = [
+    { siparisId: 4, urunler: [{ ad: "Ergonomik Koltuk", fiyat: 9500 }] }
+];
+
+    
+const tumSiparisler = hamSiparisler.concat(yedekSiparisler);
+console.log(tumSiparisler);
+
+// 2. flatMap: Her siparişin içindeki 'urunler' dizisini alıp, tek bir düz ürünler dizisi  getirir.
+
+const tumUrunler = tumSiparisler.flatMap(siparis => siparis.urunler);
+console.log(tumUrunler);
+
+// (Sadece 'map' kullansaydık diziler içinde diziler [ [], [], [] ] elde ederdik.)
+
+
+
+//tekDizi = tumSiparisler.flatMap();
+
+
+// 3. filter & map & slice (Görseldeki mantığın zincirlenmiş hali)
+// Senaryo: Fiyatı 12500'den küçük olan ilk 3 ürünün sadece isimlerini vitrinde göster.
+
+let ucuzlar;
+ucuzlar= tumUrunler.filter(urun => urun.fiyat < 12500).map(urun => urun.ad).slice(0,3);;
+
+console.log(ucuzlar)
+
+// 4. reduce: Finansal hesaplama
+// Senaryo: Fiyatı 12500'den büyük olan tüm ürünlerin toplam maliyetini hesapla.
+let pahalilar;
+let pahaliToplam;
+pahalilar = tumUrunler.filter(urun=> urun.fiyat > 12500).map(urun => urun.fiyat);
+pahaliToplam= pahalilar.reduce((toplam, sayi) => toplam + sayi, 0); // reduce metodunun birçok farklı işlevi vardır.
+console.log(pahaliToplam)
+
+// reduce ile tek metoda indirgeme, tercih edilmez.
+const ucuzlar2 = tumUrunler.reduce((acc, urun) => {
+  if (urun.fiyat < 6000) acc.push(urun.ad);
+  return acc;
+}, []);
+
+</script>
+
+</body>
+</html>
