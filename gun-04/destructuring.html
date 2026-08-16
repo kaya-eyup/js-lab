@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+
+<script>
+
+// //                          array (dizi) destructuring (yapı bozma)
+
+// // dizilerde index numarasına göre atama yapılır.
+
+// let user= ["Eyüp", "Kaya", "Antalya", "Konyaaltı", "07000"];
+
+// // let ad = name[0];
+// // let soyad = name[1];  // amele yöntemi.
+
+
+// let [ad, soyad, ...adress]= user;
+
+
+
+
+// console.log(ad, soyad, adress);
+
+
+
+// const koordinatlar = [40.7128, 74.0060, 150]; // Enlem, Boylam, Rakım
+
+// const [enlem, boylam, rakım]= koordinatlar;
+
+// console.log(enlem, boylam);
+
+
+// //                                 object (nesne) destructuring
+// Destructuring'in tek cümlelik mantığı: "bu nesnenin içinden şu parçaları çıkar, aynı isimde değişken yap." Kutudan eşya alıp masaya dizmek gibi — kutu yerinde duruyor.
+
+// // nesnelerde property adına göre atama yapılır.
+
+// const urunBilgi={
+//     isim: "Iphone 15",
+//     renk :"Siyah",
+//     fiyat: 12999,
+//     // stok : true,
+// }
+//  console.log(urunBilgi);
+
+
+// let {isim, renk, fiyat, stok =false} = urunBilgi;
+
+// console.log(isim, fiyat, stok)
+
+
+
+//                              destructuring uygulama
+
+
+const kullanici = { ad: "Ayşe", yas: 22, adres: { sehir: "İzmir" } };
+
+const { ad, yas } = kullanici;
+console.log(ad, yas);
+
+
+const { ad: isim } = kullanici;  // "nesnedeki ad anahtarının değerini al, adı isim olan yeni bir değişkene koy." Ortaya çıkan değişken isim'dir, ad değil.
+console.log(isim);
+      
+const { meslek = "belirsiz" } = kullanici;   // meslek varsa valuesini, yoksa default olarak belirsiz değerini döndürür.
+console.log(meslek);
+
+
+const { adres: { sehir } } = kullanici;      //  İzmir
+console.log(sehir);
+
+
+
+//const { iletisim: {email } } = kullanici?.iletisim?.email;   // ? ← burada dur, düşün. // olmayan key için default atama yapılmamış hata vermeli. 
+const email = kullanici.iletisim?.email ?? "yok";
+console.log(email)
+
+ 
+
+ 
+const { ad: userAd, ...gerisi } = kullanici; // gerisi ne oldu?  / / geri kalanları kendi içine alır. //doğru
+console.log(gerisi);
+
+const [x, y = 99] = [1];                     // ?    //bune amk?
+
+</script>
+
+</body>
+</html>

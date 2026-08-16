@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+
+<script>
+//  spread operatörü, "...xyz" xyz adlı dizinin elemanlarını döngüye ihtiyaç kalmadan döndürür.
+// iki veya fazlası dizinin elemanlarını yeni bir diziye dökebilir. bkz: dizi3= [...dizi1, ...dizi2]
+
+// const dizi1=[1,2,3];
+// const dizi2=[4,5,6];
+
+// let dizi3 = [...dizi1, ...dizi2];
+
+// console.log(dizi3)
+
+// bir dizi değerini diğerine atadığında oluşan referans copy tehlikesini, dizi1in elemanlarını dizi2nin içine dökerek let dizi1= [...dizi2] şeklinde değeri kopyalayarak çözebilirsin.
+
+
+// dizi1=[1, 2, 3];
+// dizi2=dizi1;
+// console.log(dizi2)
+// console.log(dizi1);     
+
+// let dizi1= dizi2         //referans adresini kopyalar, bi değişiklik ikisini de vurur
+// let dizi1= [...dizi2]    // içindeki değeri (value) kopyalar ve yeni adrese kaydeder. güvenle değiştirebilirsin.
+
+// dizi1=[1, 2, 3];
+// dizi2= [...dizi1];
+
+// dizi2[0]= 5
+
+// console.log(dizi2)
+// console.log(dizi1);  
+
+
+// spread YÜZEYSEL kopyalama yapar, iç içe geçmiş nesne/dizilerde başka bir yöntem kullanacaksın, structuredClone.
+// const orijinalProfil = {
+//   id: 101,
+//   rol: "admin",
+//   ayarlar: {
+//     tema: "dark",
+//     otomatikKayit: true
+//   },
+//   kayitTarihi: new Date() 
+// };
+
+// const derinkopya= structuredClone(orijinalProfil);
+
+// derinkopya.ayarlar.tema= "light";
+
+
+// console.log(orijinalProfil);
+
+// console.log(derinkopya);
+
+// fonksiyon içinde kullanmaya rest parameters denir. döngüleri öğrenince buraya birdaha bak !!!!
+
+//                      Spread uygulama
+
+
+const a = { ad: "Ali", yas: 20 };   // a= {ali, 20}
+
+const b = { ...a, yas: 21 };        // b= {ali, 21}
+const c = { yas: 21, ...a };      // b ile c aynı mı? neden? //  aynı olur, spread edilen objedeki key spread edildiği yerde var ise edildiği yerin value'sini alır  // GÜNCELLEME: yanılmışım, spread edilen objenin içini soldan sağa okur ve en sondaki valueyi alır key için. yani objenin içinde ne tarafa spread edildiği dikkat edilmesi gereken bir detay. Log'a ekle.
+
+console.log(b);
+console.log(c);
+
+const d = { ...a };             
+d === a                           // ? //   spread farklı referansı alır, false   // doğru.
+d.ad = "Veli"; a.ad    ;           // ? //  farklı referanstan dolayı Ali çıkmalı // doğru.
+
+let esitlik = (d ===a);
+let ayniMi = a.ad
+console.log(esitlik);
+console.log(ayniMi);
+
+const sprDizi=  [...[1,2], ...[3,4]] ;             // ?  [1,2,3,4] çıkmalı diye tahmin ediyorum // doğru.
+console.log(sprDizi);
+const sacmaDizi= [..."merhaba"]  ;  // ? — spread neyin üstünde çalışıyor?   neyi neyin içine dizecek ki aq, merhaba zaten dizinin elemanı değil mi?
+console.log(sacmaDizi);             // harfleri tek tek çıkaracağını tahmin etmemiştim. sayı ile de denendi, stringi parçalarına ayırıyor.
+
+const sonSacmaDizi = { ...[10, 20] }                   // ? — bu ne üretti, neden?    // objenin 0. indeksi 10, 1. indeksi 20 olur // doğru
+console.log(sonSacmaDizi);
+
+
+</script>
+
+</body>
+</html>
