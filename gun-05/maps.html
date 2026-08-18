@@ -1,0 +1,72 @@
+          
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+<script>
+  //                maps, (object olan maps)
+
+// object elementinin upgrade edilmiş versiyonu gibi düşünebilirsin
+
+
+const ogrenciler= new Map();
+
+
+console.log(ogrenciler);
+
+
+ogrenciler.set(1, "Eyüp Kaya");   // set metodu map'e entry ekler. (key, value)
+ogrenciler.set(12548, "Ahmet Kaya");
+ogrenciler.set("popstar", "Michael Jackson");
+
+
+console.log(ogrenciler.get("popstar"));  // get metodu keyi girilen değeri return eder.
+
+let sonuc;
+
+
+
+sonuc= ogrenciler.size; // map elementinin entry sayısını return eder.
+console.log(sonuc);
+sonuc = ogrenciler.has(2); // girilen key mapte var ise true, yok ise false
+
+
+console.log(sonuc);
+
+//ogrenciler.delete(1); // keyi girilen entryi siler.
+//sonuc=ogrenciler.size;
+//console.log(sonuc);
+
+//ogrenciler.clear() // bütün elemanları siler.
+//console.log(ogrenciler)
+
+
+
+
+for(let x of ogrenciler.keys()){
+console.log(x)
+}
+
+for(let x of ogrenciler.values()){
+    console.log(x)
+}
+
+
+for(let [key,value] of ogrenciler.entries()){
+    console.log(key,value);
+}
+    </script>
+
+
+
+
+
+</body>
+</html>
