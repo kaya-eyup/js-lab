@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+
+
+
+
+
+
+
+
+        //                           "once" fonksiyonu
+
+//                      Bazı işler tam olarak bir kez yapılmalı:
+
+// Veritabanı bağlantısını kur — ikinci kez kurarsan iki bağlantın olur.
+// Ayarları dosyadan oku — her seferinde okumak boşuna disk erişimi.
+// Kullanıcıya "hoş geldin" penceresi göster — ikinci kez gösterirsen rahatsız edicidir.
+// Ödeme isteği gönder — ikinci kez gönderirsen müşteriden iki kez para çekersin.
+
+
+//Mantığı: Bir fonksiyonun, ne kadar çağrılırsa çağrılsın yalnızca bir kez çalışmasını garanti etmektir. İlk çağrıda orijinal fonksiyon çalışır ve sonucu (varsa) saklanır. Sonraki tüm çağrılar, orijinal fonksiyonu tekrar çalıştırmadan doğrudan saklanan bu ilk sonucu döndürür.
+
+
+
+
+
+
+const kur = once(() => {
+  console.log("bağlantı kuruluyor");
+  return { baglanti: 1 };
+});
+
+const a = kur(); // "bağlantı kuruluyor" → {baglanti: 1}
+const b = kur(); // sessiz              → {baglanti: 1}
+a === b;         // true — aynı nesne, kopya değil
+
+
+// bu fonksiyon, yüksek mertebeli bir fonksiyondur(sarmalayıcı), istediğin fonksiyon ile çalıştır, sadece bir kez çalıştırır. 
+// aşağıdaki örnek , (sektörde sabit, heryerde aynı) once ile sarmalayıcı fonksiyon kalıbıdır. bunu yazarsın, sonra once ile kullanmak istediğin fonksiyonu dışarısında başka bir yere yazıp bağlarsın.
+
+// A. Sarmalayacak olan Higher-Order fonksiyonumuz
+function once(fn) {
+  let hasBeenCalled = false;
+  let cachedResult;
+
+  return function(...args) {    // ...args şu anlama gelir: "Dışarıdan kaç tane parametre gelirse gelsin, umurumda değil. Hepsini topla ve args adında bir dizi (array) içine koy."
+    if (!hasBeenCalled) {
+      cachedResult = fn.apply(this, args); //Bu satır asıl fonksiyona şunu der: "Al kardeşim, kapıya gelen bütün argümanları diziden çıkarıp sana aynen iletiyorum, işini yap."
+      hasBeenCalled = true;
+    }
+    return cachedResult;
+  };
+}
+
+// B. sarmalayıcı kalıptan geçireceğimiz asıl fonksiyon
+// B. Asıl tehlikeli/maliyetli fonksiyonumuz
+function odemeYap(tutar, paraBirimi) {
+  console.log(`Banka API'sine istek gitti: ${tutar} ${paraBirimi} çekildi.`);
+  return "İşlem Başarılı - Dekont ID: #9842";
+}
+
+// C. Fonksiyonu güvenli (tek seferlik) hale getirme (once kılıfını giydiriyoruz.)
+const tekSeferlikOdeme = once(odemeYap);
+
+// D. Çalıştırma Denemeleri
+console.log(tekSeferlikOdeme(500, "TL")); // 1. Çağrı
+console.log(tekSeferlikOdeme(800, "dolar")); // 2. Çağrı
+console.log(tekSeferlikOdeme(81230, "TL")); // 3. Çağrı
+console.log(tekSeferlikOdeme(544510, "euro")); // 4. Çağrı
+
+
+const f = once(() => { console.log("çalıştı"); return null; });
+f();           // tahminin? // çalıştı
+f();           // tahminin? // boş
+
+const g = once((a, b) => a + b);
+console.log(g(2, 3));       // tahminin? // 5
+
+const nesne = { x: 10, oku: once(function () { return this.x; }) };
+console.log(nesne.oku());   // tahminin? // 10 , ok fonksiyonu olsaydı this bağlamı olmadığı için atama aramaya globale çıkar ve saçmalardı.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>

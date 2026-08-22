@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+
+    <script>
+
+
+//                    memoize
+
+//Mantığı: Zaman (CPU) ile Alan (Bellek) arasında yapılan bir takastır. Aynı argümanlarla tekrar tekrar çağrılan, işlem maliyeti yüksek bir fonksiyonun sonucunu önbelleğe (cache) alır. Aynı argümanlar tekrar geldiğinde, $O(1)$ sürede hesaplamayı atlayıp direkt önbellekteki veriyi döner.
+// sadece saf fonksiyonlar ile kullanılabilir girdisi dışında hiçbir şeye bakmayan, dışarıda hiçbir şeyi değiştirmeyen fonksiyona saf fonksiyon (pure function) denir.
+// function yavasKare(n) {
+//   // 2 saniye süren pahalı bir hesap olduğunu varsay
+//   console.log(n*n);
+// }
+
+// yavasKare(4);  // 2 saniye
+// yavasKare(4);  // 2 saniye daha — oysa cevabı zaten biliyorduk
+// yavasKare(4);  // 2 saniye daha
+
+
+//Terim: hesaplanmış sonucu saklayıp tekrar kullanmaya önbellekleme (caching) denir. Fonksiyon sonuçlarını argümanına göre önbelleklemenin özel adı memoizasyon (memoization).
+
+// memoize, aynı once gibi sektörde sabit kalıbı olan sarmalayıcı bir fonksiyondur.
+
+// A. Sarmalayıcı Higher-Order Fonksiyonumuz (Kalıp)
+function memoize(fn) {
+  const cache = new Map(); // Bellek defteri: { "girdiKey": sonuc } 
+
+  return function(...args) {
+    // Gelen parametreleri bir anahtara dönüştür (örn: [5, 10] -> "[5,10]")
+    const key = JSON.stringify(args);
+
+    // 3. Map.has() ile anahtarın varlığı kontrol edilir
+    if (cache.has(key)) {
+      console.log(`[Cache HIT] Sonuç hafızadan alındı -> Key: ${key}`);
+      return cache.get(key); // Map.get() ile değer okunur
+    }
+
+    // 4. Yoksa asıl fonksiyon çalıştırılır ve Map.set() ile kaydedilir
+    console.log(`[Cache MISS] Yeni hesaplama yapılıyor -> Key: ${key}`);
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    
+    return result;
+  };
+}
+// B. Asıl Maliyetli Fonksiyon
+function agırKarekokToplam(a, b) {
+  return Math.sqrt(a) + Math.sqrt(b);  // sayıların karekökleri toplamı
+}
+
+// C. Fonksiyona memoize kılıfı giydiriliyor
+const hızlıKarekok = memoize(agırKarekokToplam);
+
+// D. Çalıştırma Denemeleri
+console.log(hızlıKarekok(16, 25)); // 1. Çağrı (16 ve 25 ilk defa görülüyor) -> Hesaplanır -> 9
+console.log(hızlıKarekok(16, 25)); // 2. Çağrı (Aynı parametreler) -> Cache'ten anında gelir -> 9
+console.log(hızlıKarekok(100, 4)); // 3. Çağrı (Yeni parametreler) -> Hesaplanır -> 12
+console.log(hızlıKarekok(16, 25)); // 4. Çağrı (Tekrar 16 ve 25) -> Cache'ten anında gelir -> 9
+
+
+let sayac = 0;
+const kare = memoize(n => { sayac++; return n * n; });
+
+kare(4);  // 16
+kare(4);  // 16
+kare(5);  // 25
+console.log(sayac);   // ← kaç olmalı? önce yaz, sonra çalıştır // önce 1, sonra yine 1 , sonra 2. ekrana en son değer olan 2 yazdırılır.
+kare(0);   
+ 
+
+
+
+let bayatverideneyi = memoize(() => Math.random()) ; 
+console.log(bayatverideneyi());
+console.log(bayatverideneyi());
+console.log(bayatverideneyi());
+console.log(bayatverideneyi());
+
+
+
+
+// yaz ve çalıştır. Çıkan sonuç sana ne söylüyor? sabit bi değer olmasını istediğimiz şeye niye random özelliği verelim ki, istediğin kadar yaz aynı değeri döndürür. buna bayat veri deniyordu sanırım.
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
