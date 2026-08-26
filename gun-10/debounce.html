@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+
+
+                <!-- debounce nedir? -->
+
+
+
+
+<!-- Debounce, sürekli ve peş peşe tetiklenen bir olayın (event), işlem yapmayı tetiklemesini kullanıcı duraksayana veya eylemini bitirene kadar erteleme tekniğidir.
+
+Gerçek hayattan en net analoji asansör kapısıdır:
+
+Bir asansöre bindiğinde kapının kapanması için örneğin 3 saniye süre vardır.
+
+Süre işlerken dışarıdan yeni biri gelip kapı açma düğmesine basarsa, 3 saniyelik sayaç sıfırlanır ve baştan başlar.
+
+Yeni biri gelmeyi bıraktığı andan itibaren 3 saniye kesintisiz geçer ve kapı öyle kapanır.
+
+Yazılımdaki mantık da tam olarak budur: Her tetiklemede mevcut zamanlayıcı (setTimeout) iptal edilir (clearTimeout) ve yenisi başlatılır. -->
+
+
+
+
+    <script>
+
+        function debounce(fn, gecikme) {
+  // (a) Zamanlayıcı kimliğini tutacak değişken:
+  // İlk değeri atanmazsa otomatik olarak 'undefined' olur (veya açıkça 'let timerId = null;' yazılabilir).
+  let timerId;
+
+  return function (...args) {
+    // (b) Varsa eski randevuyu iptal et:
+    // timerId undefined/null olsa bile clearTimeout hata vermez, güvenle çalışır.
+    clearTimeout(timerId);
+
+    // (c) Yeni randevu kur:
+    // 'gecikme' süresi dolunca fn fonksiyonunu gelen argümanlarla (...args) çalıştır
+    // ve dönen timer kimliğini (a)'daki değişkene ata.
+    timerId = setTimeout(() => {
+      fn(...args);
+    }, gecikme);
+  };
+}
+
+const ara = debounce((metin) => console.log("ARAMA:", metin), 300);
+
+ara("k"); ara("ke"); ara("ked"); ara("kedi");
+// Beklenen: ~300ms sonra TEK satır → ARAMA: kedi
+
+setTimeout(() => ara("k"), 1000);  // 1000 ms sonra çalıştır kodu
+setTimeout(() => ara("e"), 2000);
+setTimeout(() => ara("d"), 3000);
+setTimeout(() => ara("i"), 4000);
+
+// Beklenen: ÜÇ ayrı satır → ARAMA: a / ARAMA: b / ARAMA: c
+
+    </script>
+</body>
+</html>

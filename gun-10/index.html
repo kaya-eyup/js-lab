@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gün 10 — To-Do</title>
+  <style>
+    .completed .metin { text-decoration: line-through; opacity: .6; }
+    .aktif { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div id="uygulama">
+    <input id="yeni-gorev" placeholder="Yeni görev...">
+    <button data-action="ekle">Ekle</button>
+
+
+    <div>
+      <button data-action="filtre" data-filtre="hepsi">Hepsi</button>
+      <button data-action="filtre" data-filtre="bitmemis">Tamamlanmamış</button>
+      <button data-action="filtre" data-filtre="bitmis">Tamamlanmış</button>
+    </div>
+
+    <button data-action="temizle">Tümünü temizle</button>
+
+    <ul id="liste"></ul>
+    <p id="bilgi"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
