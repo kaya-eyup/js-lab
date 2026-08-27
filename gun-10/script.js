@@ -87,7 +87,7 @@ function render(durum) {
   }
 
   // 5. Filtre Butonlarının Aktiflik Durumunu Güncelle
-  const filtreButonlari = document.querySelector('button[data-action="filtre"]');
+  const filtreButonlari = document.querySelectorAll('button[data-action="filtre"]');
   filtreButonlari.forEach((btn) => {
     // Butonun data-filtre değeri state'teki filtre ile aynıysa .aktif ekle, değilse sil
     if (btn.dataset.filtre === durum.filtre) {
