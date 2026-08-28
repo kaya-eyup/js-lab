@@ -45,31 +45,39 @@ function init() {
  const storage = {
    // Kayıt varsa nesne olarak döndürür, hiç kayıt yoksa null döndürür
    load() {
-     // depodan veriyi metin olarak getir
      const kayitliMetin = localStorage.getItem(DEPO_ANAHTARI); 
-  
-     // Guard Clause: Eğer depo boşsa null döndür ki uygulama çökmesin
-     if (!kayitliMetin) return null; 
-  
-     // metni tekrar objeye çevir
-     return JSON.parse(kayitliMetin); 
+  if (!kayitliMetin) return null; 
+
+  try {
+    return JSON.parse(kayitliMetin);
+  } catch (hata) {
+    console.warn("Depodaki veri bozuk, temizlenip sıfırlanıyor...", hata.message);
+    this.clear(); // Bozuk veriyi silerek kendini onarır
+    return null;  // init'e null döner, böylece init varsayılan durumla başlar
+  }
    },
    // Verilen durum nesnesini deftere metin olarak yazar.
    save(durum) {
-     // Sadece kalıcı olmasını istediğimiz alanları seçiyoruz
+  try {
     const kaydedilecekVeri = {
-    gorevler: durum.gorevler,
-    filtre: durum.filtre
-    //arama metni kalıcı olmayacak.
-     };
-     
-     
-     // Gelen canlı objeyi tarayıcının anlayacağı metne (JSON) çevir
-     const metin = JSON.stringify(kaydedilecekVeri); 
-  
-     // Anahtar kelime ile depoya yaz
-     localStorage.setItem(DEPO_ANAHTARI, metin); 
+      gorevler: durum.gorevler,
+      filtre: durum.filtre
+    };
+
+    const metin = JSON.stringify(kaydedilecekVeri); 
+    localStorage.setItem(DEPO_ANAHTARI, metin);
+    return true; // Kayıt başarılı
+  } catch (hata) {
+    console.error("Depolama başarısız (Depo dolu veya engelli):", hata.name, hata.message);
+    return false; // Kayıt başarısız
+  }
    },
+
+
+
+
+
+
    // Kayıt sayfasını siler.
    clear() {
   
@@ -96,7 +104,9 @@ function createItem(gorev) {
     durumkontrol.dataset.action = "degistir"
     // 3. İçerik
     const div = document.createElement("span");
-    div.textContent = gorev.name;
+  div.textContent = gorev.name;
+   // div.textContent = gorev.name; // tehlikeli
+  
     div.className = "metin"
 
     // 4. Sil Butonu
@@ -297,5 +307,15 @@ arama.addEventListener("input", debounce((e) => {
   aramaAyarla(e.target.value);
 }, 300));// 0 olarak tanımlayınca (debouncenin olmadığı senaryonun simülasyonu için 0 denedim) her klayve basışında veri gönderiyor. API maliyeti gereksiz uçar.
 
-
 init();
+// localStorage.setItem("todo:v1", "{bozuk");
+
+
+
+// const t0 = performance.now();
+// for (let i = 0; i < 500; i++) {
+//   durum.gorevler.push({ id: crypto.randomUUID(), name: "Görev " + i, completed: i % 3 === 0 });
+// }
+
+// render(durum);
+// console.log(performance.now() - t0);

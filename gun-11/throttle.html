@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+  <script>
+    // ===== 1. DEBOUNCE WRAPPER =====
+// Mantık: Her tetiklemede sayacı sıfırlar, sessizlik olunca sonuncuyu çalıştırır.
+function debounce(fonksiyon, gecikme) {
+  let zamanlayici;
+
+  return function (...args) {
+    clearTimeout(zamanlayici); // Varsa eski beklemeyi iptal et
+    zamanlayici = setTimeout(() => {
+      fonksiyon.apply(this, args);
+    }, gecikme);
+  };
+}
+
+// ===== 2. THROTTLE WRAPPER =====
+// Mantık: İlk çağrıyı hemen veya beklemede çalıştırır, süre dolana kadar aradaki çağrıları engeller (musluğu kısar).
+function throttle(fonksiyon, limit) {
+  let beklemede = false;
+
+  return function (...args) {
+    if (beklemede) return; // Kilit kapalıysa gelen tüm çağrıları yut
+
+    fonksiyon.apply(this, args); // Fonksiyonu çalıştır
+    beklemede = true;            // Kilidi kapat
+
+    setTimeout(() => {
+      beklemede = false;         // Belirlenen süre (limit) bitince kilidi tekrar aç
+    }, limit);
+  };
+}
+
+// ===== 3. KABUL TESTİ VE GÖZLEM =====
+
+// Throttle Testi: Fare sürekli hareket etse bile her 500ms'de sadece bir kez yazar
+const throttleYaz = throttle((e) => {
+  console.log("THROTTLE (Düzenli Akış):", Date.now(), `[X: ${e.clientX}]`);
+}, 1000);
+
+// Debounce Testi: Fare sürekli hareket ederken HİÇBİR ŞEY yazmaz, hareket tamamen durunca 500ms sonra tek bir kez yazar
+const debounceYaz = debounce((e) => {
+  console.log("DEBOUNCE (Sessizlik Sonrası):", Date.now(), `[X: ${e.clientX}]`);
+}, 1000);
+
+// Olay Dinleyicileri
+window.addEventListener("mousemove", throttleYaz);
+window.addEventListener("mousemove", debounceYaz); 
+  </script>
+
+
+
+
+
+  </body>
+</html>
