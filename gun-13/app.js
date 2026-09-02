@@ -4,11 +4,6 @@
 const input = document.querySelector("#search");
 const output = document.querySelector("#output");
 
-// fetch("https://countries.dev/name/turkey")
-
-//     .then((answer) => answer.json())
-//     .then((data) => console.log(data));                   //       dizi basar? dizi içinde obje şeklinde propertyler
-// console.log(fetch("https://countries.dev/name/turkey"));  //        bilmiyorum. promise olayının durumunu yazdırdı. denemek için bozdum, rejected yazdırdı. fetch'in başarı durumunu yazdırıyor
 
 // ── 1. DURUM ────────────────────────────
 
@@ -21,15 +16,13 @@ let state = {
 
 // ── 2. API KATMANI ──────────────────────  ← BUGÜNÜN YENİ KISMI
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function ulkeyiGetir(name) {
+function getCountryByName(name,options = {}) {
     
 //   // 1. fetch işlemini doğrudan RETURN ediyoruz (böylece dışarıda .then kullanılabilir)
 //   return fetch(`https://countries.dev/name/${name}`)
     // GEÇİCİ — yarışı görmek için, sonra silinecek
-const fakeDelay = name.length < 5 ? 3000 : 0;
-return sleep(fakeDelay).then(() => fetch(`https://countries.dev/name/${name}`))
+return fetch(`https://countries.dev/name/${name}`, options)
     .then((answer) => {
     // 1. HTTP durumu 200-299 aralığında değilse (örn: 404 veya 500)
     if (!answer.ok) {
@@ -105,7 +98,7 @@ function createCountryCard(country) {
   img.style.objectFit = "cover";
   name.textContent = country.name;
   name.className = "h5 text-primary fw-bold text-center mb-3";
-  capital.textContent = country.capital;
+  capital.textContent =  country.capital;
   capital.className = "text-muted small mb-2";
   population.textContent = country.population;
   population.className = "text-muted small mb-2";
@@ -125,52 +118,51 @@ function createCountryCard(country) {
 // ── 4. EYLEMLER ─────────────────────────
 
 
+let activeController = null;
 
-
-
-
-
-let idSayaci = 0; // her çağrıda sıfırlanmasın diye dışarda
 function search(name) {
-  // önce kontrol
   if (name.trim() === "") {
+    if (activeController) activeController.abort();  // kutu boşaltıldı, uçan istek varsa iptal
+    activeController = null;
     state.screen = "idle";
     render();
     return;
-    }
-    
-    // sonra diğerleri
-    
-    const istekId = ++idSayaci;
+  }
 
-  state.screen = "loading"; // ← 1. an
+  if (activeController) activeController.abort();     // önceki arama iptal
+  activeController = new AbortController();
+
+  state.screen = "loading";
   render();
-  ulkeyiGetir(name)
-      .then((list) => {
-          if (istekId !== idSayaci) return;
+
+  getCountryByName(name, { signal: activeController.signal })
+    .then((list) => {
       state.matches = list;
-      state.screen = list.length === 0 ? "empty" : "success"; // ← 2. an
+      state.screen = list.length === 0 ? "empty" : "success";
       render();
     })
-      .catch((err) => {
-        if (istekId !== idSayaci) return;
-      state.error = err.message;
-      state.screen = "error"; // ← 3. an
+    .catch((error) => {
+      if (error.name === "AbortError") return;        // benim kararımdı, arıza değil
+      state.error = error.userMessage ?? error.message;
+      state.screen = "error";
       render();
     });
 }
 
+
+
+
 // debounce WRAPPER
 
-function debounce(fonksiyon, gecikme) {
-  let zamanlayici; // Bu değişken closure sayesinde hafızada asılı kalır
+function debounce(fn, delay) {
+  let timerId; // Bu değişken closure sayesinde hafızada asılı kalır
 
   return function (...args) {
-    clearTimeout(zamanlayici); // Eski sayacı sıfırla
+    clearTimeout(timerId); // Eski sayacı sıfırla
 
-    zamanlayici = setTimeout(() => {
-      fonksiyon.apply(this, args); // Gecikme bitince asıl fonksiyonu çalıştır
-    }, gecikme);
+    timerId = setTimeout(() => {
+      fn.apply(this, args); // Gecikme bitince asıl fonksiyonu çalıştır
+    }, delay);
   };
 }
 
