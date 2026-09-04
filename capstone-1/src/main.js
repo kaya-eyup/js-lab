@@ -19,23 +19,20 @@ import { startRouter, navigate } from "./router.js";
 // console.log(parseQuery("?q=t%C3%BCrk")); // { q: "türk", page: 1 }
 
 // GEÇİCİ — Adım 4'te gerçek render gelecek
- function debugRender(route) {
-   document.querySelector("#app").textContent = JSON.stringify(route, null, 2);
- }
- startRouter(debugRender);
-window.navigate = navigate;   // GEÇİCİ — konsoldan denemek için
- 
+function debugRender(route) {
+  document.querySelector("#app").textContent = JSON.stringify(route, null, 2);
+}
+startRouter(debugRender);
 
 // #0, history.length başlangı. değeri 1
 // #1, url eklendi, history = 2
 // #2, değişmedi
-// #3, url ?q=phone oldu. 
+// #3, url ?q=phone oldu.
 // #4, url /product/9 oldu, history= 3
 // #5, istenen phone sorgu urlsine döndü.
 // #6, istenen şekilde oldu yine.
 // #7, /kediler oldu url, history= 4
 // #8, aynen öyle oldu.
-
 
 // bir de bunu gözle dediğin deney:
 
@@ -44,3 +41,18 @@ window.navigate = navigate;   // GEÇİCİ — konsoldan denemek için
 // ekstra detaylar:
 // adres çubuğuna elle yazıp popstate yapamıyoruz.  f5e tıklamış gibi tepki veriyor sadece.
 // google.comu navigate etmek istediğinde güvenlik hatası verdi, kabul edilebilir bi tepki.
+
+// adım 3 a etiketi deneyleri:
+// const link = document.querySelector("a");
+
+// console.log(link.getAttribute("href"));
+
+// console.log(link.href);
+// console.log(link.origin);
+// console.log(link.pathname);
+// console.log(link.search);
+// console.log(link.hash);
+
+// adım 3 sağlamaları
+//console.log(history.length);
+// kosnsolda yapıldı, hepsi istendiği gibi.
