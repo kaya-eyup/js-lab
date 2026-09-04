@@ -4,11 +4,10 @@ export const routes = [
 ];
 
 export function matchRoute(pathname) {
-  const path = pathname === "" ? "/" : pathname; // boşsa / yap, değilse devam et
 
     // kuralları sırayla deneme (list ve detail)
 
-    const pathParts = path.split("/").filter(Boolean); // kullanıcı girdisi, aynı kaldığı için sürekli döngüye sokmak yok.
+    const pathParts = pathname.split("/").filter(Boolean); // kullanıcı girdisi, aynı kaldığı için sürekli döngüye sokmak yok.
 
   for (const route of routes) {  // dış döngü-1. tur
     const routeParts = route.pattern.split("/").filter(Boolean); // /'lerden ayırıp dizi yapar, bizim tanımladığımız
@@ -45,4 +44,42 @@ const params = new URLSearchParams(search);
     return { q, page };
 
 
+}
+
+// ─────  Şu anki adresi okuma ─────
+function getCurrentRoute() { 
+  const { name, params } = matchRoute(window.location.pathname);// o anki yolu al, içinden name ve params değerlerini çek.
+  const query = parseQuery(window.location.search); // query sorgusundaki değeri çeker.
+
+  return { name, params, query }; // o anki rotanın tam resmini döndürür.
+}    // location -> { name, params, query }
+
+
+
+// ─────  Gezinme ─────
+let onRouteChange = null;
+export function navigate(url, { replace = false } = {}) { 
+     if (!onRouteChange) {
+    throw new Error("navigate() called before startRouter()");
+  }
+    const currentUrl = window.location.pathname + window.location.search; // tam adresi sorgu parametresi ile birlikte al
+    if (url === currentUrl) return; // zaten bulunduğun adrese gidemezsin
+
+    if (replace) { window.history.replaceState(null, "", url) }//Geçmiş yığınına yeni sayfa eklemez; en üstteki mevcut adres kaydının üzerine yazar.
+    else{ window.history.pushState(null, "", url)} // Geçmiş yığınına yeni bir sayfa kaydı koyar ve URL'i günceller. Sayfa kesinlikle yeniden yüklenmez.
+    
+
+    if (onRouteChange) {
+    onRouteChange(getCurrentRoute());
+  }
+
+}
+
+// ─────  Başlatma ─────
+export function startRouter(onChange) {
+  onRouteChange = onChange;
+    window.addEventListener("popstate", () => { onRouteChange(getCurrentRoute()) }); //Geri veya ileri basıldığında URL değiştiği için o anki yeni rotayı okur ve ekranı güncellemesi için fonksiyona gönderir.
+    
+  // Adım 3'te tık dinleyicisi buraya gelecek
+  onRouteChange(getCurrentRoute());   // ilk çizim
 }
