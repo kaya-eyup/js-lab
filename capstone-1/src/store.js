@@ -1,28 +1,30 @@
+import { deepFreeze } from "./lib/deepFreeze.js"; 
+
+// Vite/Snowpack gibi paketleyiciler import.meta.env.DEV değerini dev ortamında true, build ortamında false yapar.
+const freeze = import.meta.env.DEV ? deepFreeze : (x) => x;
+//Bu koruma kalkanı son kullanıcıyı değil beni (geliştiriciyi) hatalardan korumak için vardır; geliştirme aşamasında mutasyonları yakalayıp kodu zaten düzelteceğim için, üretime (production) çıkan hatasız kodda gereksiz CPU maliyeti yaratan özyinelemeli dondurma işlemine (deepFreeze) gerek kalmaz
 export function createStore(initialState) {
-  let state = initialState;
   const listeners = new Set();
+  
+  // Artık deepFreeze yerine ortam duyarlı freeze'i çağırıyoruz
+  let state = freeze(initialState); 
 
   function getState() {
       return state;
   }
 
   function setState(patch) {
-      // 1) yeni state üret (immutable)
-      state = {...state, ...patch } // üzerine güncelliyoruz.
-      // 2) her aboneyi çağır
+      state = freeze({ ...state, ...patch }); 
       for (const listener of listeners) {
-           listener(state)
+           listener(state);
       }
-      
   }
 
   function subscribe(listener) {
-    // 1) listeyi ekle
       listeners.add(listener);
-      // 2) aboneliği bitiren bir fonksiyon döndür
       return () => {
-    listeners.delete(listener);
-  };
+          listeners.delete(listener);
+      };
   }
 
   return { getState, setState, subscribe };

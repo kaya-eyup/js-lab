@@ -2,7 +2,7 @@ import { buildListUrl } from "../router.js";
 import { escapeHtml } from "../lib/escapeHtml.js";
 export function listView(state) {
     const { q, page } = state.route.query;
-
+//  state.route.query.page = 99; 
 
 
 // Sayfa 1 ise tıklanamaz span, 2 ve üzeri ise önceki sayfa linki
