@@ -1,6 +1,6 @@
 import "./style.css";
 import { startRouter, navigate, buildListUrl } from "./router.js";
-import { render } from "./render.js";
+import { render } from "./render.js"; 
 import { debounce } from "./lib/debounce.js";
 import { createStore } from "./store.js";
 
@@ -13,10 +13,33 @@ function handleSearchInput(e) {
 }
 document.addEventListener("input", handleSearchInput);
 
+document.addEventListener("click", (e) => {
+  const state = store.getState();
+  if (e.target.id === "reverse") { 
+    // Birazdan burayı dolduracağız
+    // [...dizi] ile sığ kopya alıp onu ters çeviriyoruz
+    const newItems = [...state.list.items].reverse();
+    // state.list içindeki diğer verileri (...state.list) kaybetmemek için yayıyoruz
+    store.setState({ list: { ...state.list, items: newItems } });
+  }
+  if (e.target.id === "remove-first") { 
+    // Birazdan burayı dolduracağız
+    // slice(1) orijinali bozmadan ilk eleman hariç yeni bir dizi döner
+    const newItems = state.list.items.slice(1);
+    store.setState({ list: { ...state.list, items: newItems } });
+  }
+});
+
+const fakeItems = [ 
+  { id: 121, title: "iPhone X",   price: 549 },
+  { id: 122, title: "Galaxy S20", price: 399 },
+  { id: 123, title: "Pixel 7",    price: 299 },
+  { id: 124, title: "Xiaomi 13",  price: 249 },
+];
 
 const initialState = {
   route: { name: "list", params: {}, query: { q: "", page: 1 } },
-  list: { status: "idle", items: [], total: 0, error: null },
+  list: { status: "success", items: fakeItems, total: 4, error: null },
   detail: { status: "idle", item: null, error: null },
 };
 
@@ -25,36 +48,19 @@ const store = createStore(initialState);
 store.subscribe(render);
 startRouter((route) => store.setState({ route })); // kabloyu hoparlöre bağlamadan müziği niye başlatayım ki.
 
-// deney 1
-// const frozen = Object.freeze({ a: 1 });
-// frozen.a = 99;
-// console.log(frozen.a); // htmlde module olarak çekilen dosyalar katı modda çalışır. burda hata fırlatır lakin konsola yazılınca daha müsamahalı davranır. sessizce devam eder, istemediğimiz şekilde yani.
+// const items = store.getState().list.items;
+// items.reverse();
+// store.setState({ list: { items } }); 
+//dondurma olayımız boşuna durmuyor, hata verecek.
+// dondurma korumasını kaldırırsak veriyi üzerine yazar ve diğer alanlar silinir. doğrusu önce spread edip ondan sonra üzerine yazdırmaktır
+
+// aşama a:  ters çevirde innerHTML sıfırlanıyor bu yüzden de odak da sıfırlanıyor. aynı durum ilkini çıkarda da var.
 
 
+// aşama c sonrası not: ilkini çıkar ve ters çevir olayları kutuya yazılan değeri etkilemiyor. burada kimlikle eşleştirme lazım. dataset id ile.
 
-// deney 2
-// const state = Object.freeze({
-//   count: 0,
-//   list: { items: [], total: 0 },
-// });
- 
-// // state.count = 5;              // 1) ? 0 olur, değiştirilemez.
-// state.list.total = 99;        // 2) ? 99 olur, gezilebilir elemanları etkileyebilirsin, o elemanın içine giremezsin
-// state.list.items.push("x");   // 3) ? x oraya girer.
-// console.log(Object.isFrozen(state), Object.isFrozen(state.list));   // 4) ? true-false dönmeli. sebebini yukarda dedim.
 
-// deney 3
-// const frozen = Object.freeze({ a: 1, b: 2 }); 
-// const next = { ...frozen, b: 3 };
-// console.log(next, Object.isFrozen(next));
-// // spread ile yapılan kopyalamalar sığ kopya olur ama burda zaten sadece tek katman var. burda frozeni dondurdun, nexte atayınca o dondurma eriyormuş yeni keşfettim. konsolda a:1 b:3 , false yazdırmalı.
-
-// deney 4
-//deepFreeze({ a: { b: { c: 1 } } }) //sonra
-//  .a.b.c = 9// 	TypeError
-//deepFreeze({ items: [1, 2] }) //sonra 
- // .items.push(3)	//TypeError
- // deepFreeze(5), deepFreeze(null)	//patlamamalı
-// aynen istendiği gibi çıktı.
-
-//deney 5 te istendiği gibi çıktı.
+// const c = document.querySelector(".cards");
+// const first = c.children[0];
+// c.appendChild(first);
+// kondolda denendi, hedef kartı en baştan en sona götürdü. 
