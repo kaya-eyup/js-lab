@@ -8,7 +8,11 @@ const routesMap = {
   notFound: notFoundView,
 };
 // nesne eşleşmesi daha kısa ve okunabilir
- export function render(state) {
+
+
+let renderCount = 0;
+export function render(state) {
+   console.log("render #" + (++renderCount), state.route.name);  // çizim sayacı kontrolü.
    const root = document.querySelector("#app");
      // ??? name'e göre görünüm seç
 
