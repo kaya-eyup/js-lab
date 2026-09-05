@@ -66,7 +66,9 @@ export function navigate(url, { replace = false } = {}) {
     if (url === currentUrl) return; // zaten bulunduğun adrese gidemezsin
 
     if (replace) { window.history.replaceState(null, "", url) }//Geçmiş yığınına yeni sayfa eklemez; en üstteki mevcut adres kaydının üzerine yazar.
-    else{ window.history.pushState(null, "", url)} // Geçmiş yığınına yeni bir sayfa kaydı koyar ve URL'i günceller. Sayfa kesinlikle yeniden yüklenmez.
+  else { window.history.pushState(null, "", url) } // Geçmiş yığınına yeni bir sayfa kaydı koyar ve URL'i günceller. Sayfa kesinlikle yeniden yüklenmez.
+  onRouteChange(getCurrentRoute());   // ← eksik olan
+
 }
 
 // ─────  Başlatma ─────
@@ -105,5 +107,19 @@ function handleLinkClick(e) {
 
 }
 
+export function buildListUrl({ q = "", page = 1 } = {}) {
+  // ??? URLSearchParams ile kur
+const searchParams = new URLSearchParams();
+  const trimmedQ = q.trim();
+  if (trimmedQ) {
+    searchParams.set("q", trimmedQ);
+  }
 
+  if (Number.isInteger(page) && page > 1) {
+    searchParams.set("page", page);
+  }
+
+  const queryString = searchParams.toString();
+  return queryString ? `/?${queryString}` : "/";
+}
 
