@@ -46,21 +46,7 @@ const initialState = {
 
 const store = createStore(initialState);
 store.subscribe(render);
-startRouter((route) => store.setState({ route })); // kabloyu hoparlöre bağlamadan müziği niye başlatayım ki.
+startRouter((route) => store.setState({ route }));
 
-// const items = store.getState().list.items;
-// items.reverse();
-// store.setState({ list: { items } }); 
-//dondurma olayımız boşuna durmuyor, hata verecek.
-// dondurma korumasını kaldırırsak veriyi üzerine yazar ve diğer alanlar silinir. doğrusu önce spread edip ondan sonra üzerine yazdırmaktır
-
-// aşama a:  ters çevirde innerHTML sıfırlanıyor bu yüzden de odak da sıfırlanıyor. aynı durum ilkini çıkarda da var.
-
-
-// aşama c sonrası not: ilkini çıkar ve ters çevir olayları kutuya yazılan değeri etkilemiyor. burada kimlikle eşleştirme lazım. dataset id ile.
-
-
-// const c = document.querySelector(".cards");
-// const first = c.children[0];
-// c.appendChild(first);
-// kondolda denendi, hedef kartı en baştan en sona götürdü. 
+import { searchProducts, getProduct } from "./api/products.js";
+window.api = { searchProducts, getProduct }; // GEÇİCİ TEST
