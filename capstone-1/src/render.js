@@ -12,10 +12,9 @@ const routesMap = {
 // nesne eşleşmesi daha kısa ve okunabilir
 
 let currentViewName = null;
-let renderCount = 0;
 
 export function render(state) {
-  console.log("render #" + (++renderCount), state.route.name);
+
 
   const root = document.querySelector("#app");
   if (!root) throw new Error("render(): #app not found");
@@ -27,23 +26,39 @@ export function render(state) {
     currentViewName = state.route.name;
   }
 
-  // 2. İçerik Güncellemesi: Kabuğu yıkmadan sadece içeriği besle
+  //  İçerik Güncellemesi: Kabuğu yıkmadan sadece içeriği besle
   if (state.route.name === "list") {
-  const { q, page } = state.route.query;
+    const { q, page } = state.route.query;
+    const { status, items, total, error } = state.list;
 
-  // 1. Kartları uzlaştır
+    // 1. Dört durumun ekrana yansıtılması (Türetilmiş durum kontrolüyle)
+    const statusEl = root.querySelector(".status");
+    if (statusEl) {
+      if (status === "loading") {
+        statusEl.textContent = "Yükleniyor...";
+      } else if (status === "error") {
+        statusEl.textContent = error;
+      } else if (status === "success" && items.length === 0) {
+        statusEl.textContent = "Sonuç bulunamadı.";
+      } else if (status === "success") {
+        statusEl.textContent = `${total} sonuç listelendi`;
+      } else {
+        statusEl.textContent = "";
+      }
+    }
+  //  Kartları uzlaştır
   updateList(root.querySelector(".cards"), state.list.items);
 
-  // 2. Arama kutusu (kontrollü alan)
+  //  Arama kutusu (kontrollü alan)
    const input = root.querySelector("#search");
     if (input.value !== q)
       input.value = q; 
 
-  // 3. Bilgi satırı
+  //  Bilgi satırı
   const meta = root.querySelector(".meta");
   if (meta) meta.textContent = `q = "${q}" · sayfa = ${page}`;
 
-  // 4. Pager bağlantıları (??? olan yer)
+  //  Pager bağlantıları (??? olan yer)
   const pager = root.querySelector(".pager");
   if (pager) {
     const prevButton =
