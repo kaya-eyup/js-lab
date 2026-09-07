@@ -33,8 +33,6 @@ lib/escapeHtml.js: Zararlı XSS saldırılarına karşı kullanıcı girdilerini
 
 3. Verdiğim Kararlar
 
-Bedel: Geliştirme aşamasında performans maliyeti; karşılığında gizli yan etkilerin ve hatalı render süreçlerinin engellenmesi.
-
 Karar: Havadaki istekler için AbortController kullanmak.
 
 Alternatif: Yalnızca debounce ile yetinmek.
@@ -79,11 +77,11 @@ Gereksiz çizim engellenmiyor (bail-out yok); state verisi hiç değişmese bile
 
 Store abonelerinde oluşabilecek hatalar izole edilmiyor (try/catch sarmalı yok); abonelerden biri hata fırlatırsa tüm render zinciri çökebilir.
 
-URL parametrelerinin güvenliği için encodeURIComponent(id) sanitizasyonu eklenmedi.
-
 Projede kod standartlarını ve olası hataları denetleyecek bir ESLint yapılandırması kurulmadı.
 
 Geçmiş çalışmalardan devreden 05-retry.js, 04-kompozisyon.js dosyaları ve Gün 13 temizlik borcu henüz eritilmedi.
+
+detailView görünümü ve loadProduct akışı henüz bağlanmadı; Gün 25'te doğrudan TypeScript ile yazılmak üzere ertelendi.
 
 6. Bir Daha Yazsam
 Çalışma zamanı (runtime) hatalarıyla boğuşmak yerine en başından TypeScript kurgusuyla başlar, container.children gibi yazılımsal yazım hatalarını kodu çalıştırdıktan sonra değil, yazarken editörde yakalardım.
