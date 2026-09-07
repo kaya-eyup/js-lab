@@ -37,6 +37,7 @@ export async function searchProducts(q = "", { page = 1, signal } = {}) {
 }
 
 export async function getProduct(id, { signal } = {}) {
-  const url = `${BASE}/products/${id}`;
+  const safeId = encodeURIComponent(id);
+  const url = `${BASE}/products/${safeId}`;
   return await http(url, { signal });
 }

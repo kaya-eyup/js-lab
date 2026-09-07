@@ -59,13 +59,20 @@ export function render(state) {
   if (meta) meta.textContent = `q = "${q}" · sayfa = ${page}`;
 
   //  Pager bağlantıları (??? olan yer)
-  const pager = root.querySelector(".pager");
+ const pager = root.querySelector(".pager");
   if (pager) {
-    const prevButton =
-      page > 1
-        ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
-        : `<span class="disabled">← Önceki</span>`;
-    const nextButton = `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`;
+    const LIMIT = 12;
+    const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+
+    const prevButton = hasPrev
+      ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
+      : `<span class="disabled">← Önceki</span>`;
+    const nextButton = hasNext
+      ? `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`
+      : `<span class="disabled">Sonraki →</span>`;
+      
     pager.innerHTML = `${prevButton}${nextButton}`;
   }
 }

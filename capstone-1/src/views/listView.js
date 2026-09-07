@@ -3,13 +3,20 @@ import { escapeHtml } from "../lib/escapeHtml.js";
 
 export function listView(state) {
   const { q, page } = state.route.query;
+  const { total } = state.list;
 
-  const prevButton =
-    page > 1
-      ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
-      : `<span class="disabled">← Önceki</span>`;
+  const LIMIT = 12;
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const hasNext = page < totalPages;
+  const hasPrev = page > 1;
 
-  const nextButton = `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`;
+  const prevButton = hasPrev
+    ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
+    : `<span class="disabled">← Önceki</span>`;
+
+  const nextButton = hasNext
+    ? `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`
+    : `<span class="disabled">Sonraki →</span>`;
 
   return `
     <div class="list">
