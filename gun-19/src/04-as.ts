@@ -37,14 +37,14 @@ const kart = {
 };
 
 
-// a) Onaylama: "ben biliyorum"
-const b1 = kart.querySelector("h3") as HTMLHeadingElement;
-b1.textContent = "Tablet";
+// a) Onaylama: "ben biliyorum"     // h4 yazınca çöküyor
+// const b1 = kart.querySelector("h3") as HTMLHeadingElement;
+// b1.textContent = "Tablet";
 
-// // b) Kontrol: derleyiciye ispatla
+// // b) Kontrol: derleyiciye ispatla // h4 yazınca susuyor
 // const b2 = kart.querySelector("h3");
 // if (b2) b2.textContent = "Tablet";
 
-// // c) Ünlem: kısa onaylama
+// // c) Ünlem: kısa onaylama         h4 yazınca çöküyor
 // const b3 = kart.querySelector("h3")!;
 // b3.textContent = "Tablet";
