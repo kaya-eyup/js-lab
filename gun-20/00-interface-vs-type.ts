@@ -22,12 +22,24 @@ const myProduct: ProductAlias = {
  // Interface denemesi
  interface Product2 { id: number; }
  interface Product2 { stock: number; }
- // Type denemesi
- type ProductAlias2 = { id: number; };
+
+
+// Type denemesi
+ 
+// @ts-expect-error
+type ProductAlias2 = { id: number; };
+ 
+// @ts-expect-error
  type ProductAlias2 = { stock: number; };
  // type ile yazınca duplicate uyarısı veriyor ama interface'de vermiyor.
 
+
+
+ // @ts-expect-error
 const p: Product = { id: 1 }   // Type '{ id: number; }' is missing the following properties from type 'Product': title, price
+
+
+// @ts-expect-error
 const p2: Product2 = { id: 1 }   // Property 'stock' is missing in type '{ id: number; }' but required in type 'Product2'.ts(2741)
 //                              00-interface-vs-type.ts(24, 23): 'stock' is declared here.
 
