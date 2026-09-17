@@ -1,0 +1,29 @@
+{
+  "compilerOptions": { 
+     // ── Ortam ──
+    "target": "es2023",                  // denetim hangi JS sürümüne göre yapılsın (çeviriyi Vite ayrıca yapar)
+    "lib": ["ES2023", "DOM"],            // hangi hazır tipler var sayılsın: dilin kendisi + tarayıcı (document, fetch)
+    "types": ["vite/client"],            // @types paketlerinden SADECE bunu yükle → Node tipleri içeri girmez
+    "skipLibCheck": true,                // node_modules içindeki .d.ts dosyalarını denetleme, sadece bizim kodu
+
+    // ── Modüller: Vite ile aynı dili konuşmak ──
+    "module": "esnext",
+    "moduleResolution": "bundler",       // import yollarını Vite'ın çözdüğü gibi çöz
+    "allowImportingTsExtensions": true,  // import yoluna .ts yazmaya izin ver (noEmit ile birlikte çalışır)
+    "verbatimModuleSyntax": true,        // sadece tip getiren import'u `import type` ile işaretlemeyi zorunlu kıl
+    "moduleDetection": "force",          // her dosya ayrı modül sayılsın (Gün 21'deki export {} derdi)
+    "noEmit": true,                      // tsc sadece denetler, dosya üretmez
+
+    // ── Sıkılık ──
+    "strict": true,
+    "erasableSyntaxOnly": true,          // silinince geride kod bırakan TS sözdizimini yasakla
+    "noUnusedLocals": true,              // kullanılmayan değişken = hata
+    "noUnusedParameters": true,          // kullanılmayan parametre = hata
+    "noFallthroughCasesInSwitch": true,  // break'i unutulmuş case = hata
+
+    // ── Karışık dönem ──
+    "allowJs": true,                     // .js dosyaları da projenin parçası
+    "checkJs": false                     // ama sadece başında // @ts-check yazanlar denetlenir
+  },
+  "include": ["src"]                     // sadece src/ altına bak
+}
