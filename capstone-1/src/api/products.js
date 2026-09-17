@@ -1,4 +1,4 @@
-import { http } from "../lib/http.js";
+import { http } from "../lib/http.ts";
 
 const BASE = "https://dummyjson.com";
 const LIMIT = 12;
