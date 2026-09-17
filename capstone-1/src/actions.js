@@ -28,7 +28,7 @@ export async function loadList(store, { q = "", page = 1 } = {}) {
   } catch (error) {
     // Kendi elimizle iptal ettiğimiz istekler bir hata değildir, akıştan sessizce çık
     if (error.name === "AbortError") return;
-
+    console.error(error); // yakalanan hata kullanıcıya sade mesajla gösterilir, ama geliştirici için kaybolmamalı
     // Gerçek ağ veya HTTP hatası
     store.setState({
       list: {

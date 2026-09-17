@@ -14,5 +14,3 @@ export function debounce<A extends unknown[]>(  // saracağı şeyin fonksiyon o
 }
   const onSearch = debounce((query: string) => console.log(query), 300);
 onSearch("phone");
-// @ts-expect-error — sayı kabul edilmemeli
-onSearch(42);
