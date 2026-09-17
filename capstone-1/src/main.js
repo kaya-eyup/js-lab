@@ -7,7 +7,7 @@ import { loadList } from "./actions.js";
 
 const onSearch = debounce((value) => {
   navigate(buildListUrl({ q: value, page: 1 }), { replace: true });
-}, 300);
+}, 600);
 
 function handleSearchInput(e) {
   if (!e.target.matches("#search")) return;

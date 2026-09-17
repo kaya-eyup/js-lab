@@ -1,6 +1,7 @@
-export function escapeHtml(value) {
-    // & < > " ' karakterlerini HTML varlıklarına çevir
-    if (!value) return "";
+export function escapeHtml(value: string | undefined | null): string {
+  
+  // & < > " ' karakterlerini HTML varlıklarına çevir
+  if (!value) return "";
   return String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
