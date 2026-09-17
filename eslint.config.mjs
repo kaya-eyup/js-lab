@@ -15,9 +15,19 @@ export default defineConfig([
 
   {
     files: ["**/*.json"],
+    // 1. DÜZELTME: Normal JSON bloğuna "ignores" satırını ekleyip tsconfig ve package-lock'u dışlıyoruz.
+    ignores: ["package-lock.json", "**/tsconfig*.json"],
     plugins: { json },
     language: "json/json",
     extends: ["json/recommended"]
+  },
+
+  // 2. DÜZELTME: tsconfig dosyaları için özel JSONC (Yorumlu JSON) bloğunu ekliyoruz.
+  {
+    files: ["**/tsconfig*.json"],
+    plugins: { json },
+    language: "json/jsonc",
+    languageOptions: { allowTrailingCommas: true }
   },
 
   {
