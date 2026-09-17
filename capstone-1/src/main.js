@@ -1,7 +1,7 @@
 import "./style.css";
 import { startRouter, navigate, buildListUrl } from "./router.js";
 import { render } from "./render.js";
-import { debounce } from "./lib/debounce.js";
+import { debounce } from "./lib/debounce.ts";
 import { createStore } from "./store.js";
 import { loadList } from "./actions.js";
 

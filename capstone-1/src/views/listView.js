@@ -1,5 +1,5 @@
 import { buildListUrl } from "../router.js";
-import { escapeHtml } from "../lib/escapeHtml.js";
+import { escapeHtml } from "../lib/escapeHtml.ts";
 
 export function listView(state) {
   const { q, page } = state.route.query;
