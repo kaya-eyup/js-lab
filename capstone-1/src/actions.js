@@ -1,4 +1,4 @@
-import { searchProducts } from "./api/products.js";
+import { searchProducts } from "./api/products.ts";
 
 let currentController = null;
 
