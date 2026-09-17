@@ -3,7 +3,86 @@ import { http } from "../lib/http.ts";
 const BASE = "https://dummyjson.com";
 const LIMIT = 12;
 
-export async function searchProducts(q = "", { page = 1, signal } = {}) {
+// ── 1. Tipler: ürünün UYGULAMA içindeki şekli ──
+export type ProductSummary = {
+  id: number;
+  title: string;
+  price: number;
+  thumbnail: string;
+};
+export type Product = ProductSummary & {
+  description: string;
+  category: string;
+}; // Adım 4
+export type ListResult = { items: ProductSummary[]; total: number };
+type SearchOptions = { page?: number; signal?: AbortSignal };
+
+// ── 2. Sınır: unknown → kontrol edilmiş tip ──
+function parseSummary(raw: unknown): ProductSummary {
+  // nesne mi? (typeof null da "object" döner, o yüzden null ayrıca kontrol ediliyor)
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Invalid product: not an object");
+  }
+
+  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.id'nin sayı olduğunu biliyor
+  if (!("id" in raw) || typeof raw.id !== "number") {
+    throw new Error("Invalid product: id");
+  }
+
+  // title (string),
+  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.title'in string olduğunu biliyor
+  if (!("title" in raw) || typeof raw.title !== "string") {
+    throw new Error("Invalid product: title");
+  }
+  //  price (number),
+  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.price'in number olduğunu biliyor
+  if (!("price" in raw) || typeof raw.price !== "number") {
+    throw new Error("Invalid product: price");
+  }
+  //  thumbnail (string)
+  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.thumbnail'in string olduğunu biliyor
+  if (!("thumbnail" in raw) || typeof raw.thumbnail !== "string") {
+    throw new Error("Invalid product: thumbnail");
+  }
+
+  return {
+    id: raw.id,
+    title: raw.title,
+    price: raw.price,
+    thumbnail: raw.thumbnail,
+  };
+}
+
+function parseList(raw: unknown): ListResult {
+  // nesne mi? (typeof null da "object" döner, o yüzden null ayrıca kontrol ediliyor)
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Invalid list: not an object");
+  }
+  if (
+    !("products" in raw) ||
+    !Array.isArray(raw.products)
+  ) // nurda dizi kontrolünde ünlemi unuttuğum için bi 15dk takıldım.
+  {
+    throw new Error("Invalid list: products");
+  }
+
+  if (!("total" in raw) || typeof raw.total !== "number") {
+    throw new Error("Invalid list: total");
+  }
+
+  return { items: raw.products.map(parseSummary), total: raw.total }; // raw.products burada any
+}
+
+function parseProduct(raw: unknown): Product {
+  /* Adım 4 */
+}
+
+// ── 3. Dışarıya açılan fonksiyonlar ──
+
+export async function searchProducts(
+  q = "",
+  { page = 1, signal }: SearchOptions = {},
+): Promise<ListResult> {
   const trimmedQ = q.trim();
   const skip = (page - 1) * LIMIT;
 
@@ -22,21 +101,14 @@ export async function searchProducts(q = "", { page = 1, signal } = {}) {
 
   // 2. İstek ve veri çevirisi
   const data = await http(url, { signal });
-
-  const items = data.products.map((p) => ({
-    id: p.id,
-    title: p.title,
-    price: p.price,
-    thumbnail: p.thumbnail,
-  }));
-
-  return {
-    items,
-    total: data.total,
-  };
+  return parseList(data);
+  
 }
 
-export async function getProduct(id, { signal } = {}) {
+export async function getProduct(
+  id: string,
+  { signal }: { signal?: AbortSignal } = {},
+): Promise<unknown> {
   const safeId = encodeURIComponent(id);
   const url = `${BASE}/products/${safeId}`;
   return await http(url, { signal });
