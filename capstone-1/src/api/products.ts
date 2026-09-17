@@ -1,4 +1,4 @@
-import { http } from "../lib/http.ts";
+import { http, HttpError } from "../lib/http.ts";
 
 const BASE = "https://dummyjson.com";
 const LIMIT = 12;
@@ -13,7 +13,7 @@ export type ProductSummary = {
 export type Product = ProductSummary & {
   description: string;
   category: string;
-}; // Adım 4
+};
 export type ListResult = { items: ProductSummary[]; total: number };
 type SearchOptions = { page?: number; signal?: AbortSignal };
 
@@ -30,17 +30,15 @@ function parseSummary(raw: unknown): ProductSummary {
   }
 
   // title (string),
-  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.title'in string olduğunu biliyor
   if (!("title" in raw) || typeof raw.title !== "string") {
     throw new Error("Invalid product: title");
   }
   //  price (number),
-  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.price'in number olduğunu biliyor
   if (!("price" in raw) || typeof raw.price !== "number") {
     throw new Error("Invalid product: price");
   }
-  //  thumbnail (string)
-  // alan var mı + doğru türde mi? Bu if'ten sonra TS raw.thumbnail'in string olduğunu biliyor
+  //  thumbnail (string),
+
   if (!("thumbnail" in raw) || typeof raw.thumbnail !== "string") {
     throw new Error("Invalid product: thumbnail");
   }
@@ -58,11 +56,7 @@ function parseList(raw: unknown): ListResult {
   if (typeof raw !== "object" || raw === null) {
     throw new Error("Invalid list: not an object");
   }
-  if (
-    !("products" in raw) ||
-    !Array.isArray(raw.products)
-  ) // nurda dizi kontrolünde ünlemi unuttuğum için bi 15dk takıldım.
-  {
+  if (!("products" in raw) || !Array.isArray(raw.products)) {
     throw new Error("Invalid list: products");
   }
 
@@ -74,7 +68,30 @@ function parseList(raw: unknown): ListResult {
 }
 
 function parseProduct(raw: unknown): Product {
-  /* Adım 4 */
+  //  Ortak 4 alanı doğrula
+  const summary = parseSummary(raw);
+
+  // TS için raw hâlâ unknown → nesne kontrolü tekrar
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("Invalid product: not an object");
+  }
+
+  //  description kontrolü
+  if (!("description" in raw) || typeof raw.description !== "string") {
+    throw new Error("Invalid product: description");
+  }
+
+  //  category kontrolü
+  if (!("category" in raw) || typeof raw.category !== "string") {
+    throw new Error("Invalid product: category");
+  }
+
+  //  Her şey tamamsa, summary'den gelen 4 alanı ve buradan gelen 2 alanı birleştir
+  return {
+    ...summary,
+    description: raw.description,
+    category: raw.category,
+  };
 }
 
 // ── 3. Dışarıya açılan fonksiyonlar ──
@@ -102,14 +119,23 @@ export async function searchProducts(
   // 2. İstek ve veri çevirisi
   const data = await http(url, { signal });
   return parseList(data);
-  
 }
 
 export async function getProduct(
   id: string,
   { signal }: { signal?: AbortSignal } = {},
-): Promise<unknown> {
+): Promise<Product | null> {
   const safeId = encodeURIComponent(id);
   const url = `${BASE}/products/${safeId}`;
-  return await http(url, { signal });
+  try {
+    const data = await http(url, { signal });
+    return parseProduct(data);
+  } catch (error) {
+    // 1) error 404 taşıyan bir HttpError ise → null döndür
+    if (error instanceof HttpError && error.status === 404) {
+      return null;
+    }
+    // 2) değilse → aynı hatayı olduğu gibi tekrar fırlat
+    throw error;
+  }
 }
