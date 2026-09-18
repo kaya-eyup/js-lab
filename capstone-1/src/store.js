@@ -1,4 +1,4 @@
-import { deepFreeze } from "./lib/deepFreeze.js"; 
+import { deepFreeze } from "./lib/deepFreeze.ts"; 
 
 // Vite/Snowpack gibi paketleyiciler import.meta.env.DEV değerini dev ortamında true, build ortamında false yapar.
 const freeze = import.meta.env.DEV ? deepFreeze : (x) => x;
