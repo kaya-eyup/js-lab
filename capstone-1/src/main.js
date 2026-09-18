@@ -3,7 +3,7 @@ import { startRouter, navigate, buildListUrl } from "./router.ts";
 import { render } from "./render.js";
 import { debounce } from "./lib/debounce.ts";
 import { createStore } from "./store.ts";
-import { loadList } from "./actions.js";
+import { loadList } from "./actions.ts";
 
 const onSearch = debounce((value) => {
   navigate(buildListUrl({ q: value, page: 1 }), { replace: true });
