@@ -1,79 +1,71 @@
 import { listView } from "./views/listView.js";
- import { updateList } from "./lib/updateList.js";
- import { detailView } from "./views/detailView.js";
- import { notFoundView } from "./views/notFoundView.js";
+import { updateList } from "./lib/updateList.js";
+import { detailView } from "./views/detailView.js";
+import { notFoundView } from "./views/notFoundView.js";
 import { buildListUrl } from "./router.ts";
-
+import { visibleItems, visibleTotal, statusText } from "./selectors.js"
+import { LIMIT} from "./api/products.ts"
 const routesMap = {
   list: listView,
   detail: detailView,
   notFound: notFoundView,
 };
-// nesne eşleşmesi daha kısa ve okunabilir
 
 let currentViewName = null;
 
+// ───── Sunum Katmanı Yardımcıları ─────
+
+
 export function render(state) {
-
-
   const root = document.querySelector("#app");
   if (!root) throw new Error("render(): #app not found");
 
   // 1. Kabuk (Shell) Kurulumu: YALNIZCA rota (sayfa türü) değiştiğinde
   if (state.route.name !== currentViewName) {
     const viewFn = routesMap[state.route.name] || routesMap.notFound;
-    root.innerHTML = viewFn(state); // listView yerine seçilen viewFn çalıştırılıyor
+    root.innerHTML = viewFn(state);
     currentViewName = state.route.name;
   }
 
-  //  İçerik Güncellemesi: Kabuğu yıkmadan sadece içeriği besle
+  // İçerik Güncellemesi: Kabuğu yıkmadan sadece içeriği besle
   if (state.route.name === "list") {
     const { q, page } = state.route.query;
-    const { status, items, total, error } = state.list;
 
-    // 1. Dört durumun ekrana yansıtılması (Türetilmiş durum kontrolüyle)
+    // 1. Durum metnini güncelle
     const statusEl = root.querySelector(".status");
     if (statusEl) {
-      if (status === "loading") {
-        statusEl.textContent = "Yükleniyor...";
-      } else if (status === "error") {
-        statusEl.textContent = error;
-      } else if (status === "success" && items.length === 0) {
-        statusEl.textContent = "Sonuç bulunamadı.";
-      } else if (status === "success") {
-        statusEl.textContent = `${total} sonuç listelendi`;
-      } else {
-        statusEl.textContent = "";
-      }
+      statusEl.textContent = statusText(state.list);
     }
-  //  Kartları uzlaştır
-  updateList(root.querySelector(".cards"), state.list.items);
 
-  //  Arama kutusu (kontrollü alan)
-   const input = root.querySelector("#search");
-    if (input.value !== q)
-      input.value = q; 
+    // 2. Kartları uzlaştır
+    updateList(root.querySelector(".cards"), visibleItems(state.list));
 
-  //  Bilgi satırı
-  const meta = root.querySelector(".meta");
-  if (meta) meta.textContent = `q = "${q}" · sayfa = ${page}`;
+    // Arama kutusu (kontrollü alan)
+    const input = root.querySelector("#search");
+    if (input && input.value !== q) {
+      input.value = q;
+    }
 
-  //  Pager bağlantıları (??? olan yer)
- const pager = root.querySelector(".pager");
-  if (pager) {
-    const LIMIT = 12;
-    const totalPages = Math.max(1, Math.ceil(total / LIMIT));
-    const hasNext = page < totalPages;
-    const hasPrev = page > 1;
+    // Bilgi satırı
+    const meta = root.querySelector(".meta");
+    if (meta) meta.textContent = `q = "${q}" · sayfa = ${page}`;
 
-    const prevButton = hasPrev
-      ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
-      : `<span class="disabled">← Önceki</span>`;
-    const nextButton = hasNext
-      ? `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`
-      : `<span class="disabled">Sonraki →</span>`;
-      
-    pager.innerHTML = `${prevButton}${nextButton}`;
+    // Pager bağlantıları (visibleTotal üzerinden)
+    const pager = root.querySelector(".pager");
+    if (pager) {
+      const total = visibleTotal(state.list);
+      const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+      const hasNext = page < totalPages;
+      const hasPrev = page > 1;
+
+      const prevButton = hasPrev
+        ? `<a href="${buildListUrl({ q, page: page - 1 })}">← Önceki</a>`
+        : `<span class="disabled">← Önceki</span>`;
+      const nextButton = hasNext
+        ? `<a href="${buildListUrl({ q, page: page + 1 })}">Sonraki →</a>`
+        : `<span class="disabled">Sonraki →</span>`;
+
+      pager.innerHTML = `${prevButton}${nextButton}`;
+    }
   }
-}
 }

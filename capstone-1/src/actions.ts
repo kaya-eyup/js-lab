@@ -1,8 +1,27 @@
 import { searchProducts } from "./api/products.ts";
+import { HttpError } from "./lib/http.ts"; // 1. Runtime sınıfı olduğu için normal import
+import type { Store } from "./store.ts";
+import type { AppState, FetchState } from "./types.ts";
+import type { ListResult } from "./api/products.ts";
 
-let currentController = null;
+let currentController: AbortController | null = null;
 
-export async function loadList(store, { q = "", page = 1 } = {}) {
+function previousData(list: FetchState<ListResult>): ListResult | null {
+  switch (list.status) {
+    case "idle":
+    case "error":
+      return null;
+    case "success":
+      return list.data;
+    case "loading":
+      return list.previous;  
+  }
+}
+
+export async function loadList(
+  store: Store<AppState>,
+  { q = "", page = 1 }: { q?: string; page?: number } = {},
+) {
   // 1. Havada asılı önceki istek varsa fişini çek
   currentController?.abort();
 
@@ -10,33 +29,37 @@ export async function loadList(store, { q = "", page = 1 } = {}) {
   const controller = new AbortController();
   currentController = controller;
 
-  // 3. Durumu "loading" yap (Yayma tuzağı: eski listeyi koru ki ekran aniden sıfırlanmasın)
+  // 3. Durumu "loading" yap
   store.setState({
-    list: { ...store.getState().list, status: "loading", error: null },
+    list: { status: "loading", previous: previousData(store.getState().list) }, // "yüklenirken ekran boşalmasın diye önceki sonuç taşınıyor"
   });
 
+  // 3. Değişiklik: try daraltıldı
+  let result;
   try {
-    const { items, total } = await searchProducts(q, {
+    result = await searchProducts(q, {
       page,
       signal: controller.signal,
     });
-
-    // Başarılı: veriyi state'e bas
-    store.setState({
-      list: { status: "success", items, total, error: null },
-    });
   } catch (error) {
-    // Kendi elimizle iptal ettiğimiz istekler bir hata değildir, akıştan sessizce çık
-    if (error.name === "AbortError") return;
-    console.error(error); // yakalanan hata kullanıcıya sade mesajla gösterilir, ama geliştirici için kaybolmamalı
-    // Gerçek ağ veya HTTP hatası
+    // 2. Değişiklik: İptal kontrolü
+    if (error instanceof DOMException && error.name === "AbortError") return;
+
+    console.error(error);
+
+    // 2. Değişiklik: HttpError daraltması ve sade error state
+    const message =
+      error instanceof HttpError ? error.userMessage : "Bir hata oluştu.";
+
     store.setState({
       list: {
         status: "error",
-        items: [],
-        total: 0,
-        error: error.userMessage ?? "Bir hata oluştu.",
+        message,
       },
     });
+    return;
   }
+
+  // Başarılı durum: try'ın tamamen dışında
+  store.setState({ list: { status: "success", data: result } });
 }
