@@ -1,5 +1,5 @@
 import "./style.css";
-import { startRouter, navigate, buildListUrl } from "./router.js";
+import { startRouter, navigate, buildListUrl } from "./router.ts";
 import { render } from "./render.js";
 import { debounce } from "./lib/debounce.ts";
 import { createStore } from "./store.ts";

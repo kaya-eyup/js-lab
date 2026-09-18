@@ -2,7 +2,7 @@ import { listView } from "./views/listView.js";
  import { updateList } from "./lib/updateList.js";
  import { detailView } from "./views/detailView.js";
  import { notFoundView } from "./views/notFoundView.js";
-import { buildListUrl } from "./router.js";
+import { buildListUrl } from "./router.ts";
 
 const routesMap = {
   list: listView,

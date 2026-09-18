@@ -1,4 +1,4 @@
-import { buildListUrl } from "../router.js";
+import { buildListUrl } from "../router.ts";
 import { escapeHtml } from "../lib/escapeHtml.ts";
 
 export function listView(state) {
