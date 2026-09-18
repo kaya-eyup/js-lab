@@ -16,7 +16,7 @@ function handleSearchInput(e) {
 document.addEventListener("input", handleSearchInput);
 
 const initialState = {
-  route: { name: "list", params: {}, query: { q: "", page: 1 } },
+  route: { name: "list", query: { q: "", page: 1 } },
   list: { status: "idle", items: [], total: 0, error: null },
   detail: { status: "idle", item: null, error: null },
 };

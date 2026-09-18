@@ -1,5 +1,5 @@
 export function detailView(state) {
-  const { id } = state.route.params;
+  const  id  = state.route.id;
 
   return `
     <div class="detail">

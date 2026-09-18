@@ -20,7 +20,7 @@
     "noUnusedLocals": true,              // kullanılmayan değişken = hata
     "noUnusedParameters": true,          // kullanılmayan parametre = hata
     "noFallthroughCasesInSwitch": true,  // break'i unutulmuş case = hata
-
+    "noUncheckedIndexedAccess": true,
     // ── Karışık dönem ──
     "allowJs": true,                     // .js dosyaları da projenin parçası
     "checkJs": false                     // ama sadece başında // @ts-check yazanlar denetlenir
