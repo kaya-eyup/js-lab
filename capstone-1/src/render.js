@@ -3,7 +3,7 @@ import { updateList } from "./lib/updateList.ts";
 import { detailView } from "./views/detailView.ts";
 import { notFoundView } from "./views/notFoundView.ts";
 import { buildListUrl } from "./router.ts";
-import { visibleItems, visibleTotal, statusText } from "./selectors.js"
+import { visibleItems, visibleTotal, statusText } from "./selectors.ts"
 import { LIMIT} from "./api/products.ts"
 const routesMap = {
   list: listView,
