@@ -14,3 +14,6 @@ export type FetchState<T> =
   | { status: "loading"; previous: T | null }
   | { status: "success"; data: T }
   | { status: "error"; message: string };
+
+
+export type ListState = FetchState<ListResult>;

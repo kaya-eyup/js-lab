@@ -1,27 +1,31 @@
 import "./style.css";
 import { startRouter, navigate, buildListUrl } from "./router.ts";
-import { render } from "./render.js";
+import { render } from "./render.ts";
 import { debounce } from "./lib/debounce.ts";
 import { createStore } from "./store.ts";
 import { loadList } from "./actions.ts";
-
-const onSearch = debounce((value) => {
+import type { AppState } from "./types.ts";
+const onSearch = debounce((value: string) => {
   navigate(buildListUrl({ q: value, page: 1 }), { replace: true });
 }, 600);
 
-function handleSearchInput(e) {
+function handleSearchInput(e: Event): void {
+  // target'ın gerçekten bir input olup olmadığını denetleyip daraltıyoruz
+  if (!(e.target instanceof HTMLInputElement)) return;
   if (!e.target.matches("#search")) return;
+
   onSearch(e.target.value);
 }
+
 document.addEventListener("input", handleSearchInput);
 
-const initialState = {
+const initialState: AppState = {
   route: { name: "list", query: { q: "", page: 1 } },
-  list: { status: "idle", items: [], total: 0, error: null },
-  detail: { status: "idle", item: null, error: null },
+  list: { status: "idle" },
+  detail: { status: "idle" },
 };
 
-const store = createStore(initialState); 
+const store = createStore(initialState);
 store.subscribe(render);
 
 startRouter((route) => {
@@ -29,4 +33,4 @@ startRouter((route) => {
   if (route.name === "list") {
     loadList(store, route.query);
   }
-});  
+});
