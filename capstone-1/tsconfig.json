@@ -22,7 +22,7 @@
     "noFallthroughCasesInSwitch": true,  // break'i unutulmuş case = hata
     "noUncheckedIndexedAccess": true,
     // ── Karışık dönem ──
-    "allowJs": true,                     // .js dosyaları da projenin parçası
+    "allowJs": false,                     // .js dosyaları da projenin parçası // artık değil.
     "checkJs": false                     // ama sadece başında // @ts-check yazanlar denetlenir
   },
   "include": ["src"]                     // sadece src/ altına bak
