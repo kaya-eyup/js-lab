@@ -2,7 +2,7 @@ import { http, HttpError } from "../lib/http.ts";
 import * as z from "zod";
 
 const BASE = "https://dummyjson.com";
-const LIMIT = 12;
+export const LIMIT = 12;
 
 // ── 1. Tipler: ürünün UYGULAMA içindeki şekli ──
 

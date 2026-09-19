@@ -1,10 +1,8 @@
 import type { FetchState} from "./types.ts"
 import type { ListResult, ProductSummary } from "./api/products.ts";
+import { assertNever} from "./lib/assertNever.ts"
 
 
-export function assertNever(x: never): never {
-  throw new Error(`Beklenmeyen durum: ${JSON.stringify(x)}`);
-}
 
 type ListState = FetchState<ListResult>;
 
