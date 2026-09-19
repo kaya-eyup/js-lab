@@ -1,4 +1,4 @@
-export function notFoundView() {
+export function notFoundView(): string {
   return `
     <div class="not-found">
       <h1>404 - Sayfa Bulunamadı</h1>

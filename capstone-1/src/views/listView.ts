@@ -1,7 +1,11 @@
 import { escapeHtml } from "../lib/escapeHtml.ts";
 
-export function listView(state) {
-  const { q, page } = state.route.query;
+type ListViewQuery= {
+  q: string;
+  page: number;
+}
+export function listView(query: ListViewQuery): string {
+  const { q, page }  = query;
 
   return `
     <div class="list">

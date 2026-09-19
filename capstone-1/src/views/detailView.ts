@@ -1,6 +1,4 @@
-export function detailView(state) {
-  const  id  = state.route.id;
-
+export function detailView(id : string): string {
   return `
     <div class="detail">
       <a href="/">← Listeye dön</a>
