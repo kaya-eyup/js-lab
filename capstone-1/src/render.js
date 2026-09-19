@@ -1,7 +1,7 @@
-import { listView } from "./views/listView.js";
-import { updateList } from "./lib/updateList.js";
-import { detailView } from "./views/detailView.js";
-import { notFoundView } from "./views/notFoundView.js";
+import { listView } from "./views/listView.ts";
+import { updateList } from "./lib/updateList.ts";
+import { detailView } from "./views/detailView.ts";
+import { notFoundView } from "./views/notFoundView.ts";
 import { buildListUrl } from "./router.ts";
 import { visibleItems, visibleTotal, statusText } from "./selectors.js"
 import { LIMIT} from "./api/products.ts"

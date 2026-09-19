@@ -2,7 +2,7 @@
   "compilerOptions": { 
      // ── Ortam ──
     "target": "es2023",                  // denetim hangi JS sürümüne göre yapılsın (çeviriyi Vite ayrıca yapar)
-    "lib": ["ES2023", "DOM"],            // hangi hazır tipler var sayılsın: dilin kendisi + tarayıcı (document, fetch)
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],            // hangi hazır tipler var sayılsın: dilin kendisi + tarayıcı (document, fetch)
     "types": ["vite/client"],            // @types paketlerinden SADECE bunu yükle → Node tipleri içeri girmez
     "skipLibCheck": true,                // node_modules içindeki .d.ts dosyalarını denetleme, sadece bizim kodu
 
