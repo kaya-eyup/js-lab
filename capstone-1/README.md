@@ -1,91 +1,75 @@
-1. Ne Bu ve Nasıl Çalıştırılır?
-Bu proje; DummyJSON API'sinden çektiği ürünleri arama, sayfalama, detay görüntüleme ve 404 sayfası desteğiyle listeleyen, istemci taraflı (client-side) bir e-ticaret katalog uygulamasıdır. Dış bir framework kullanmadan kimlik tabanlı uzlaştırma (identity-based reconciliation), merkezi state ve SPA yönlendirmesinin perde arkasını deneyimlemek için saf (Vanilla) JavaScript ile yazılmıştır. Herhangi bir harici framework kullanılmadan modern frontend mimarisinin temelleri atılmıştır. 
+# Vanilla Architecture & State Management (SPA)
 
-Bash
+## 1. What is this and how to run it?
+This project is a client-side e-commerce catalog application that lists products fetched from the DummyJSON API with support for search, pagination, detail routing, and a 404 page. It is built with **TypeScript** without any external UI frameworks to explore identity-based reconciliation, centralized state management, and SPA client-side routing under the hood.
+
+### Scripts
+```bash
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
-2. Mimari ve Dosya Sorumlulukları
-index.html: Uygulamanın ana kabuğu ve dinamik içeriklerin yerleşeceği #app taşıyıcısı.
 
-main.js: Uygulama giriş noktası, olay dinleyicileri ve yönlendirici (router) başlatıcısı.
+# Run TypeScript typechecker (strict mode, zero emit)
+npm run typecheck
 
-store.js: Sistemin tek gerçeklik kaynağı (Single Source of Truth) ve durum yöneticisi.
+# Build for production
+npm run build
+```
 
-router.js: Sayfa yenilenmesini engelleyen, pushState/popstate tabanlı SPA yönlendiricisi.
+---
 
-actions.js: Asenkron iş akışlarını, veri çekme eylemlerini ve iptal (abort) sinyallerini yönetir.
+## 2. Architecture & File Responsibilities
+* `index.html`: Application shell containing the `#app` container mount point.
+* `src/main.ts`: Entry point, event delegates, and router initialization.
+* `src/types.ts`: Centralized TypeScript interfaces and discriminated unions for application state.
+* `src/store.ts`: Central Single Source of Truth (SSOT) state store.
+* `src/router.ts`: Popstate/pushState-based client-side SPA router.
+* `src/actions.ts`: Asynchronous actions, side-effects, and fetch orchestration with `AbortController`.
+* `src/selectors.ts`: Memoized/derived state helpers (`visibleItems`, `visibleTotal`, `statusText`) using strict pattern matching and exhaustive checks.
+* `src/render.ts`: Decoupled layout engine executing shell mounting and content reconciliation via fail-fast DOM queries.
+* `src/views/listView.ts`, `src/views/detailView.ts`, `src/views/notFoundView.ts`: Pure view templates returning string markup.
+* `src/lib/dom.ts`: Generic type-safe DOM querying helper (`getElement`) ensuring fail-fast runtime element retrieval.
+* `src/lib/assertNever.ts`: Exhaustive compile-time check utility for discriminated unions.
+* `src/lib/updateList.ts`: Identity-based (DOM `data-id`) list reconciler patching DOM nodes in-place to retain input values and focus ..
+* `src/api/products.ts`: API client validating incoming data through Zod schemas into strict DTOs.
+* `src/lib/http.ts`: Standardized fetch wrapper throwing strongly typed `HttpError` instances.
+* `src/lib/deepFreeze.ts`: Recursive object freeze utility protecting state from unintentional runtime mutations.
+* `src/lib/debounce.ts`: Input throttler preventing redundant API dispatches.
+* `src/lib/escapeHtml.ts`: Basic XSS sanitization filter for dynamic user input strings.
 
-render.js: State güncellendiğinde ilgili görünümleri çağıran ve ekranı hazırlayan şantiye şefi.
+---
 
-views/listView.js, views/detailView.js, views/notFoundView.js: State'i okuyarak ekrana basılacak HTML şablonlarını döndüren görünüm (view) fonksiyonları.
+## 3. Decisions Made
+* **Decision:** Use `AbortController` for in-flight queries.  
+  * *Trade-off:* Added boilerplate over pure debouncing, but completely eliminates race conditions when slow responses arrive late.
+* **Decision:** Map-based identity reconciliation using `data-id` instead of full `innerHTML` sweeps.  
+  * *Trade-off:* Requires manual DOM nodes bookkeeping, but preserves form input state and browser focus without re-mounting.
+* **Decision:** DTO validation via Zod schemas.  
+  * *Trade-off:* Extra runtime layer; guarantees compile-time model isolation if the upstream API payload changes .
+* **Decision:** Restrict `deepFreeze` execution to the development environment.  
+  * *Trade-off:* Small risk of unhandled mutation in production, but avoids recursive CPU overhead on user devices .
 
-lib/updateList.js: Ekrandaki fiziksel düğümleri data-id ile eşleştirip yerinde yamayan kimlik tabanlı DOM uzlaştırma (reconciliation) motoru.
+---
 
-api/products.js: Sunucu verisini arayüzün beklediği formata (DTO) çeviren ağ katmanı.
+## 4. Architectural Pain Points
+* **Cost of Schema Evolution:** Adding a single attribute (e.g., `rating`) requires coordinated edits across API DTOs, initial template builders, and reconciliation mappers .
+* **Implicit Coupling via CSS Selectors:** Selectors (`.cards`, `.status`, `#search`) create invisible contracts between view strings and render orchestration .
+* **Lack of Render Bail-out:** Any state transition invokes a complete DOM reconciler pass regardless of whether the actual data payload changed .
 
-lib/http.js: Fetch API'yi sarmalayan ve hataları HttpError sınıfıyla standartlaştıran yapıcı.
+---
 
-lib/deepFreeze.js: State nesnesinin dışarıdan mutasyona uğramasını engelleyen özyinelemeli kalkan.
+## 5. Conscious Tech Debt
+1. **Detail View Placeholder:** `loadProduct` action and real product API data are not connected yet; `detailView` currently acts as a skeleton displaying only the route ID.
+2. **Missing Formatter Setup:** Prettier/code formatter is not configured yet; quotes and indentation inconsistencies remain across files.
+3. **Selector Coupling:** Class names like `.status`, `.meta`, and `.cards` tightly couple view templates directly to `render.ts` .
+4. **Scattered Pager Logic:** Query URL builders and button representations are partially distributed between view templates and render loops ..
+5. **No Store Re-entrancy Protection:** The store does not block `setState` dispatches originating from inside ongoing subscription listeners ..
+6. **No Subscription Error Boundary:** Uncaught subscriber errors can disrupt the entire render lifecycle .
 
-lib/debounce.js: Hızlı klavye girdilerinde API isteklerini frenleyen zamanlayıcı.
+---
 
-lib/escapeHtml.js: Zararlı XSS saldırılarına karşı kullanıcı girdilerini temizleyen güvenlik filtresi.
-
-3. Verdiğim Kararlar
-
-Karar: Havadaki istekler için AbortController kullanmak.
-
-Alternatif: Yalnızca debounce ile yetinmek.
-
-Bedel: Kod karmaşası; karşılığında eski isteklerin geç gelip yeni ekranı ezmesinin (Race condition) kesin olarak çözülmesi.
-
-Karar: innerHTML yerine Map ve data-id tabanlı kimlik uzlaştırması.
-
-Alternatif: Ekranı tamamen silip baştan çizmek.
-
-Bedel: Karmaşık bir DOM taşıma algoritması yazmak; karşılığında form inputlarındaki değerlerin ve tarayıcı odağının korunması.
-
-Karar: DTO (Data Transfer Object) adaptörü kullanmak.
-
-Alternatif: API JSON yanıtını doğrudan arayüze basmak.
-
-Bedel: Ekstra bir dosya/fonksiyon katmanı; karşılığında backend yapısı değiştiğinde arayüz bileşenlerinin kırılmaması.
-
-Karar: deepFreeze korumasını yalnızca geliştirme ortamıyla (dev) sınırlamak.
-
-Alternatif: Üretim ortamında da sürekli çalıştırmak.
-
-Bedel: Canlıda kaza eseri mutasyon yaşanma ihtimali; karşılığında son kullanıcı için gereksiz özyinelemeli (recursive) CPU maliyetinden kurtulmak.
-
-4. Bu Mimarinin Canımı Yaktığı Yerler
-Yeni bir alan ekleme maliyeti ve sessiz hatalar: Ürün modeline "derecelendirme (rating)" gibi tek bir değişken eklemek istediğimde üç dosyaya dokunmam gerekiyor: api/products.js (DTO), views/listView.js (kartın ilk kurulduğu yer) ve lib/updateList.js (kartın güncellendiği yer). İşin en tehlikeli yanı; alanı listView'e ekleyip updateList'te unutursam, veri ilk çizimde doğru görünür, ancak güncellemede eski değerinde donup kalır. Çalışıyor gibi görünüp sessizce yanlış veri gösteren en sinsi hata türü.
-
-Kırılgan DOM Seçicileri: Etiket isimleri ve sınıflar (örn. h3, .card) doğrudan JavaScript içinde sabit (hardcoded) yazıldığı için, HTML tarafında yapılacak ufak bir stil veya etiket değişikliğinde uygulamanın sessizce çökme potansiyeli çok yüksek.
-
-İşlemci İsrafı: State içindeki veriler öncekiyle birebir aynı olsa dahi, state her set edildiğinde updateList.js döngüsü çalışıp aynı metinleri DOM düğümlerine tekrar atıyor. Gerçek düğümleri kontrol ederken araya giren bir koruma katmanı yok.
-
-5. Bilinçli Borçlar
-Pager mantığı iki yerde parçalı duruyor (listView ve render) — birini değiştirirsem diğeri sessizce eski kalmaya mahkum.
-
-.status, .meta ve .cards sınıf adları iki dosya arasında oku olmayan, son derece kırılgan bir bağ (coupling) yaratıyor.
-
-updateList motoru yalnızca .cards sınıfı için çalışıyor, uygulamanın geneline hizmet edecek şekilde soyutlanamadı.
-
-Store'da yeniden giriş (reentrancy) koruması yok; setState döngüsü içinde yeni bir setState çağrılmasını engelleyen teknik bir kilit yerine sadece iyi niyete dayalı yazılı olmayan bir kural var.
-
-Gereksiz çizim engellenmiyor (bail-out yok); state verisi hiç değişmese bile render döngüsü baştan sona tetikleniyor.
-
-Store abonelerinde oluşabilecek hatalar izole edilmiyor (try/catch sarmalı yok); abonelerden biri hata fırlatırsa tüm render zinciri çökebilir.
-
-Projede kod standartlarını ve olası hataları denetleyecek bir ESLint yapılandırması kurulmadı.
-
-Geçmiş çalışmalardan devreden 05-retry.js, 04-kompozisyon.js dosyaları ve Gün 13 temizlik borcu henüz eritilmedi.
-
-detailView görünümü ve loadProduct akışı henüz bağlanmadı; Gün 25'te doğrudan TypeScript ile yazılmak üzere ertelendi.
-
-6. Bir Daha Yazsam
-Çalışma zamanı (runtime) hatalarıyla boğuşmak yerine en başından TypeScript kurgusuyla başlar, container.children gibi yazılımsal yazım hatalarını kodu çalıştırdıktan sonra değil, yazarken editörde yakalardım.
-
-State güncellemelerinde yeni veri eskisinin birebir aynısıysa render sürecini tamamen durduracak basit bir erken çıkış (Object.is tabanlı bail-out) kontrolü eklerdim.
-
-React kullanırdım — ama artık hangi problemi çözdüğünü bildiğim için kullanırdım, kolay olduğu için değil.
+## 6. Retrospective
+* Building the reconciler manually clarifies why Virtual DOM implementations exist: the problem was never about DOM speed, but about managing synchronization complexity without bespoke DOM code.
+* Moving to TypeScript early eliminates runtime query regressions (`container.children`, `e.target` typing) directly at compilation phase .
